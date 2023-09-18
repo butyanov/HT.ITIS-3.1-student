@@ -2,7 +2,13 @@ version: '3.8'
 services:
   dotnet_postgres:
     image: postgres:alpine
-    
+    environment:
+      POSTGRES_USER: userPostgres
+      POSTGRES_PASSWORD: passwordPostgres
+      POSTGRES_DB: dbPostgres
+    ports:
+      - "5432:5432"
+
   dotnet_rabbitmq:
     image: rabbitmq:3-alpine
     
@@ -17,6 +23,15 @@ services:
     
   dotnet_main:
     image: dotnet-web
+    environment:
+      ConnectionStrings__Default: "Host=localhost;Username=userPostgres;Password=passwordPostgres;Database=dbPostgres"
+    build:
+      context: .
+      dockerfile: Dotnet.Homeworks.MainProject/Dockerfile
+    ports:
+      - "5100:80"
+    depends_on:
+      - dotnet_postgres
     
   dotnet_mailing:
     image: dotnet-web
